@@ -1,60 +1,63 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'dart:math';  // Importação da biblioteca 'dart:math' para usar a classe Random
+import 'package:flutter/material.dart';  // Importação do pacote flutter/material.dart, que contém widgets do Material Design
+import 'package:provider/provider.dart';  // Importação do pacote provider, que fornece gerenciamento de estado
 
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
-      child: DiceApp(),
+      create: (_) => ThemeProvider(),  // Criação do provider para gerenciar o tema do aplicativo
+      child: DiceApp(),  // Execução do aplicativo principal
     ),
   );
 }
 
+// Classe ThemeProvider que estende ChangeNotifier para gerenciar o tema do aplicativo
 class ThemeProvider with ChangeNotifier {
-  bool _isDarkMode = false;
+  bool _isDarkMode = false;  // Variável privada para armazenar o estado do tema
 
-  bool get isDarkMode => _isDarkMode;
+  bool get isDarkMode => _isDarkMode;  // Getter para acessar o estado do tema
 
   void toggleTheme() {
-    _isDarkMode = !_isDarkMode;
-    notifyListeners();
+    _isDarkMode = !_isDarkMode;  // Inverte o estado do tema
+    notifyListeners();  // Notifica os ouvintes sobre a mudança no estado do tema
   }
 }
 
+// Classe DiceApp que estende StatelessWidget e representa o aplicativo principal
 class DiceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);  // Obtém a instância de ThemeProvider do contexto
     return MaterialApp(
       title: 'Dice App',
-      theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
-      home: HomePage(),
+      theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),  // Define o tema do aplicativo com base no estado do tema
+      home: HomePage(),  // Define a página inicial do aplicativo
     );
   }
 }
 
+// Classe HomePage que estende StatefulWidget e representa a página inicial do aplicativo
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int? selectedNumberOfSides;
-  final List<int> numberOfSidesOptions = [6, 8, 10];
+  int? selectedNumberOfSides;  // Número de lados selecionado
+  final List<int> numberOfSidesOptions = [4,6,8,10,12,20,100];  // Lista de opções de número de lados
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dice App'),
+        title: Text('Virtual Dice'),
         actions: [
           IconButton(
             icon: Icon(Icons.lightbulb),
             onPressed: () {
               final themeProvider =
-                  Provider.of<ThemeProvider>(context, listen: false);
-              themeProvider.toggleTheme();
+                  Provider.of<ThemeProvider>(context, listen: false);  // Obtém a instância de ThemeProvider do contexto
+              themeProvider.toggleTheme();  // Altera o tema ao clicar no botão
             },
           ),
         ],
@@ -69,7 +72,7 @@ class _HomePageState extends State<HomePage> {
               groupValue: selectedNumberOfSides,
               onChanged: (int? value) {
                 setState(() {
-                  selectedNumberOfSides = value;
+                  selectedNumberOfSides = value;  // Atualiza o número de lados selecionado
                 });
               },
             ),
@@ -80,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => DicePage(
-                      numberOfSides: selectedNumberOfSides!,
+                      numberOfSides: selectedNumberOfSides!,  // Passa o número de lados selecionado para a próxima página
                     ),
                   ),
                 );
@@ -94,37 +97,38 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+// Classe DicePage que estende StatefulWidget e representa a página de jogar dados
 class DicePage extends StatefulWidget {
-  final int numberOfSides;
-  final int numberOfDice;
+  final int numberOfSides;  // Número de lados do dado
+  final int numberOfDice;  // Número de dados a serem exibidos
 
-  DicePage({required this.numberOfSides, this.numberOfDice = 1});
+  DicePage({required this.numberOfSides, this.numberOfDice = 1});  // Construtor da classe
 
   @override
   _DicePageState createState() => _DicePageState();
 }
 
 class _DicePageState extends State<DicePage> {
-  List<int> diceNumbers = [];
+  List<int> diceNumbers = [];  // Lista de números dos dados
 
   @override
   void initState() {
     super.initState();
     for (int i = 0; i < widget.numberOfDice; i++) {
-      diceNumbers.add(_generateRandomNumber());
+      diceNumbers.add(_generateRandomNumber());  // Gera números aleatórios para os dados e os adiciona à lista
     }
   }
 
   void rollDice() {
     setState(() {
       for (int i = 0; i < diceNumbers.length; i++) {
-        diceNumbers[i] = _generateRandomNumber();
+        diceNumbers[i] = _generateRandomNumber();  // Gera novos números aleatórios para os dados
       }
     });
   }
 
   int _generateRandomNumber() {
-    return Random().nextInt(widget.numberOfSides) + 1;
+    return Random().nextInt(widget.numberOfSides) + 1;  // Gera um número aleatório com base no número de lados
   }
 
   Widget buildDiceWidget(int number, ThemeData theme) {
@@ -154,12 +158,12 @@ class _DicePageState extends State<DicePage> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final theme = Theme.of(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);  // Obtém a instância de ThemeProvider do contexto
+    final theme = Theme.of(context);  // Obtém o tema atual do contexto
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dice App'),
+        title: Text('Virtual Dice'),
       ),
       body: Center(
         child: Column(
@@ -168,7 +172,7 @@ class _DicePageState extends State<DicePage> {
             for (int i = 0; i < diceNumbers.length; i++)
               Padding(
                 padding: EdgeInsets.all(10),
-                child: buildDiceWidget(diceNumbers[i], theme),
+                child: buildDiceWidget(diceNumbers[i], theme),  // Exibe os dados na tela
               ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -185,7 +189,7 @@ class _DicePageState extends State<DicePage> {
             onPressed: () {
               setState(() {
                 if (diceNumbers.length < 6) {
-                  diceNumbers.add(_generateRandomNumber());
+                  diceNumbers.add(_generateRandomNumber());  // Adiciona mais um dado à lista
                 }
               });
             },
@@ -196,7 +200,7 @@ class _DicePageState extends State<DicePage> {
             onPressed: () {
               setState(() {
                 if (diceNumbers.length > 1) {
-                  diceNumbers.removeLast();
+                  diceNumbers.removeLast();  // Remove o último dado da lista
                 }
               });
             },
